@@ -4,114 +4,118 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use ScriptMancer\Kiler\{Container, ServiceProvider};
-use ScriptMancer\Kiler\Attributes\Service;
+use ScriptMancer\Kiler\Container;
+use ScriptMancer\Kiler\Event\EventDispatcher;
 
-// Define interfaces
-interface LoggerInterface
+// Example service classes
+class DatabaseConnection
 {
-    public function log(string $message): void;
-}
+    private string $dsn;
+    private array $options;
 
-interface DatabaseInterface
-{
-    public function query(string $sql): array;
-}
-
-// Implement services
-#[Service]
-class FileLogger implements LoggerInterface
-{
-    public function log(string $message): void
+    public function __construct(string $dsn, array $options = [])
     {
-        echo "[File] $message\n";
+        $this->dsn = $dsn;
+        $this->options = $options;
+    }
+
+    public function connect(): void
+    {
+        echo "Connecting to database: {$this->dsn}\n";
     }
 }
 
-#[Service]
-class FirebaseLogger implements LoggerInterface
+class UserRepository
 {
-    public function __construct(
-        private readonly string $apiKey,
-        private readonly string $projectId
-    ) {}
+    private DatabaseConnection $db;
 
-    public function log(string $message): void
+    public function __construct(DatabaseConnection $db)
     {
-        echo "[Firebase] $message\n";
+        $this->db = $db;
+    }
+
+    public function findUser(int $id): array
+    {
+        $this->db->connect();
+        return ['id' => $id, 'name' => 'John Doe'];
     }
 }
 
-#[Service]
-class MySQLDatabase implements DatabaseInterface
-{
-    public function __construct(
-        private readonly string $host,
-        private readonly int $port,
-        private readonly string $database
-    ) {}
+// Create container and event dispatcher
+$container = Container::getInstance();
+$dispatcher = new EventDispatcher();
+$container->setEventDispatcher($dispatcher);
 
-    public function query(string $sql): array
-    {
-        echo "Executing query on MySQL: $sql\n";
-        return ['result' => 'success'];
+// Add event listener for service resolution
+$dispatcher->addListener('container.service.resolved', function(array $data) {
+    $event = $data['event'];
+    echo "Service resolved: {$event->serviceId}\n";
+    if ($event->fromCache) {
+        echo "  (from cache)\n";
     }
-}
+    if (!empty($event->dependencies)) {
+        echo "  Dependencies: " . implode(', ', $event->dependencies) . "\n";
+    }
+});
 
-// Define configuration
-$config = [
+// Load configuration from array
+$container->loadConfiguration([
     'services' => [
-        // Basic service registration
-        FileLogger::class => [
-            'class' => FileLogger::class,
-            'implements' => LoggerInterface::class,
-            'group' => 'default',
-            'tags' => ['logging'],
-            'singleton' => true
-        ],
-        
-        // Service with constructor parameters
-        FirebaseLogger::class => [
-            'class' => FirebaseLogger::class,
-            'implements' => LoggerInterface::class,
-            'group' => 'mobile',
-            'tags' => ['database'],
+        'primary.db' => [
+            'class' => DatabaseConnection::class,
             'arguments' => [
-                'apiKey' => 'your-api-key',
-                'projectId' => 'your-project-id'
-            ]
+                'dsn' => 'mysql://localhost:3306/mydb',
+                'options' => [
+                    'charset' => 'utf8mb4',
+                    'collation' => 'utf8mb4_unicode_ci'
+                ]
+            ],
+            'singleton' => true,
+            'group' => 'database',
+            'tags' => ['database', 'primary'],
+            'priority' => 100
         ],
-        
-        // Database service
-        MySQLDatabase::class => [
-            'class' => MySQLDatabase::class,
-            'implements' => DatabaseInterface::class,
+        'secondary.db' => [
+            'class' => DatabaseConnection::class,
             'arguments' => [
-                'host' => 'localhost',
-                'port' => 3306,
-                'database' => 'myapp'
-            ]
+                'dsn' => 'mysql://localhost:3306/secondary',
+                'options' => [
+                    'charset' => 'utf8mb4',
+                    'collation' => 'utf8mb4_unicode_ci'
+                ]
+            ],
+            'singleton' => true,
+            'group' => 'database',
+            'tags' => ['database', 'secondary'],
+            'priority' => 90
+        ],
+        'user.repository' => [
+            'class' => UserRepository::class,
+            'arguments' => [
+                'db' => '@primary.db' // Reference to primary database connection
+            ],
+            'singleton' => true,
+            'group' => 'repository',
+            'tags' => ['repository', 'user'],
+            'priority' => 50
         ]
     ]
-];
+]);
 
-// Bootstrap the application
-$container = Container::getInstance();
-$provider = new ServiceProvider($container);
+// Use the services
+$userRepo = $container->get('user.repository');
+$user = $userRepo->findUser(1);
+echo "Found user: " . json_encode($user) . "\n";
 
-// Load configuration
-$container->loadConfiguration($config);
+// Try to get the same service again (should use cached instance)
+$userRepo2 = $container->get('user.repository');
+$user2 = $userRepo2->findUser(2);
+echo "Found user: " . json_encode($user2) . "\n";
 
-// Test the services
-echo "Testing default logger:\n";
-$logger = $container->get(LoggerInterface::class);
-$logger->log("Hello from default logger");
+// Get services by group
+$databaseServices = $container->getServicesByGroup('database');
+echo "Database services: " . implode(', ', $databaseServices) . "\n";
 
-echo "\nTesting Firebase logger:\n";
-$firebaseLogger = $container->get(FirebaseLogger::class);
-$firebaseLogger->log("Hello from Firebase");
-
-echo "\nTesting database:\n";
-$db = $container->get(DatabaseInterface::class);
-$result = $db->query("SELECT * FROM users");
-print_r($result); 
+// Get services by tag
+$repositoryServices = $container->getServicesByTag('repository');
+echo "Repository services: " . implode(', ', $repositoryServices) . "\n"; 

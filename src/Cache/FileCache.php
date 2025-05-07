@@ -19,10 +19,16 @@ class FileCache implements ContainerCacheInterface
         $this->cacheDir = $cacheDir ?? sys_get_temp_dir() . '/kiler-cache';
         $this->defaultTtl = $defaultTtl;
 
-        if (!is_dir($this->cacheDir)) {
-            if (!mkdir($this->cacheDir, 0777, true)) {
+        try {
+            if (!is_dir($this->cacheDir) && !@mkdir($this->cacheDir, 0777, true)) {
                 throw new ContainerException("Failed to create cache directory: {$this->cacheDir}");
             }
+            
+            if (!is_writable($this->cacheDir)) {
+                throw new ContainerException("Cache directory is not writable: {$this->cacheDir}");
+            }
+        } catch (\Exception $e) {
+            throw new ContainerException("Failed to initialize cache directory: {$this->cacheDir}", 0, $e);
         }
     }
 
@@ -50,23 +56,27 @@ class FileCache implements ContainerCacheInterface
 
     public function get(string $key): mixed
     {
-        $path = $this->getPath($key);
-        if (!file_exists($path)) {
+        if (!$this->has($key)) {
             throw new NotFoundException("Cache key not found: {$key}");
         }
 
-        $data = file_get_contents($path);
+        $path = $this->getPath($key);
+        $data = @file_get_contents($path);
         if ($data === false) {
             throw new ContainerException("Failed to read cache file: {$path}");
         }
 
         try {
-            $unserialized = unserialize($data);
+            $unserialized = @unserialize($data);
             if ($unserialized === false) {
+                // Delete corrupted data
+                $this->delete($key);
                 throw new ContainerException("Failed to unserialize cache data for key: {$key}");
             }
             return $unserialized;
         } catch (\Exception $e) {
+            // Delete corrupted data
+            $this->delete($key);
             throw new ContainerException("Failed to unserialize cache data for key: {$key}", 0, $e);
         }
     }
@@ -206,13 +216,13 @@ class FileCache implements ContainerCacheInterface
             return null;
         }
 
-        $data = file_get_contents($metaPath);
+        $data = @file_get_contents($metaPath);
         if ($data === false) {
             return null;
         }
 
         try {
-            $unserialized = unserialize($data);
+            $unserialized = @unserialize($data);
             if ($unserialized === false) {
                 return null;
             }

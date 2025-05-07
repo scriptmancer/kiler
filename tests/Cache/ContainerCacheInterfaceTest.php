@@ -6,9 +6,10 @@ namespace ScriptMancer\Kiler\Tests\Cache;
 
 use PHPUnit\Framework\TestCase;
 use ScriptMancer\Kiler\Cache\ContainerCacheInterface;
+use ScriptMancer\Kiler\Cache\ArrayCache;
 use ScriptMancer\Kiler\Exceptions\NotFoundException;
 
-abstract class ContainerCacheInterfaceTest extends TestCase
+class ContainerCacheInterfaceTest extends TestCase
 {
     protected ContainerCacheInterface $cache;
 
@@ -22,7 +23,10 @@ abstract class ContainerCacheInterfaceTest extends TestCase
         $this->cache->clear();
     }
 
-    abstract protected function createCache(): ContainerCacheInterface;
+    protected function createCache(): ContainerCacheInterface
+    {
+        return new ArrayCache();
+    }
 
     public function testHasReturnsFalseForNonExistentKey(): void
     {

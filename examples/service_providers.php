@@ -8,11 +8,11 @@ use ScriptMancer\Kiler\Container;
 use ScriptMancer\Kiler\Event\EventDispatcher;
 use ScriptMancer\Kiler\Interfaces\ServiceFactoryInterface;
 use ScriptMancer\Kiler\Interfaces\ServiceProviderInterface;
-use ScriptMancer\Kiler\Attributes\Service;
+use ScriptMancer\Kiler\Attributes\{Service, Inject};
 
 // Example service classes
-#[Service]
-class DatabaseConnection
+#[Service(id: 'primary.db')]
+class PrimaryDatabaseConnection
 {
     private string $dsn;
     private array $options;
@@ -29,12 +29,30 @@ class DatabaseConnection
     }
 }
 
-#[Service]
+#[Service(id: 'secondary.db')]
+class SecondaryDatabaseConnection
+{
+    private string $dsn;
+    private array $options;
+
+    public function __construct(string $dsn, array $options = [])
+    {
+        $this->dsn = $dsn;
+        $this->options = $options;
+    }
+
+    public function connect(): void
+    {
+        echo "Connecting to secondary database: {$this->dsn}\n";
+    }
+}
+
+#[Service(id: 'user.repository')]
 class UserRepository
 {
-    private DatabaseConnection $db;
+    private PrimaryDatabaseConnection $db;
 
-    public function __construct(DatabaseConnection $db)
+    public function __construct(#[Inject('primary.db')] PrimaryDatabaseConnection $db)
     {
         $this->db = $db;
     }
@@ -51,15 +69,22 @@ class DatabaseConnectionFactory implements ServiceFactoryInterface
 {
     public function createService(Container $container, string $id, array $arguments = []): object
     {
-        return new DatabaseConnection(
-            $arguments['dsn'] ?? 'mysql://localhost:3306/mydb',
-            $arguments['options'] ?? []
-        );
+        return match($id) {
+            'primary.db' => new PrimaryDatabaseConnection(
+                $arguments['dsn'] ?? 'mysql://localhost:3306/mydb',
+                $arguments['options'] ?? []
+            ),
+            'secondary.db' => new SecondaryDatabaseConnection(
+                $arguments['dsn'] ?? 'mysql://localhost:3306/secondary',
+                $arguments['options'] ?? []
+            ),
+            default => throw new \InvalidArgumentException("Unsupported database connection type: $id")
+        };
     }
 
     public function supports(string $id): bool
     {
-        return $id === DatabaseConnection::class;
+        return $id === 'primary.db' || $id === 'secondary.db';
     }
 }
 
@@ -68,8 +93,8 @@ class DatabaseServiceProvider implements ServiceProviderInterface
 {
     public function register(Container $container): void
     {
-        // Register database connection
-        $container->register(DatabaseConnection::class, null, [
+        // Register primary database connection
+        $container->register(PrimaryDatabaseConnection::class, null, [
             'arguments' => [
                 'dsn' => 'mysql://localhost:3306/mydb',
                 'options' => [
@@ -79,13 +104,38 @@ class DatabaseServiceProvider implements ServiceProviderInterface
             ]
         ]);
 
-        // Register user repository
-        $container->register(UserRepository::class);
+        // Register secondary database connection
+        $container->register(SecondaryDatabaseConnection::class, null, [
+            'arguments' => [
+                'dsn' => 'mysql://localhost:3306/secondary',
+                'options' => [
+                    'charset' => 'utf8mb4',
+                    'collation' => 'utf8mb4_unicode_ci'
+                ]
+            ]
+        ]);
+
+        // Register user repository with dependency on primary database
+        $container->register(UserRepository::class, null, [
+            'arguments' => [
+                'db' => '@primary.db'
+            ]
+        ]);
     }
 
     public function getPriority(): int
     {
         return 100; // High priority since other services might depend on database
+    }
+
+    public function getDependencies(): array
+    {
+        return []; // Database provider has no dependencies
+    }
+
+    public function boot(Container $container): void
+    {
+        echo "Database provider booted\n";
     }
 }
 
@@ -116,11 +166,11 @@ $container->addServiceProvider(new DatabaseServiceProvider());
 $container->registerProviders();
 
 // Use the services
-$userRepo = $container->get(UserRepository::class);
+$userRepo = $container->get('user.repository');
 $user = $userRepo->findUser(1);
 echo "Found user: " . json_encode($user) . "\n";
 
 // Try to get the same service again (should use cached instance)
-$userRepo2 = $container->get(UserRepository::class);
+$userRepo2 = $container->get('user.repository');
 $user2 = $userRepo2->findUser(2);
 echo "Found user: " . json_encode($user2) . "\n"; 

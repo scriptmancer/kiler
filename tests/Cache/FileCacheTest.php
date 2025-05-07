@@ -135,8 +135,11 @@ class FileCacheTest extends TestCase
 
     public function testCacheWithInvalidDirectory(): void
     {
+        // Try to create cache in a non-existent root directory
+        $invalidDir = '/nonexistent/directory/' . uniqid();
+        
         $this->expectException(ContainerException::class);
-        new FileCache('/invalid/path/that/cannot/be/created');
+        new FileCache($invalidDir);
     }
 
     public function testCacheWithCorruptedData(): void
@@ -152,15 +155,20 @@ class FileCacheTest extends TestCase
         // Write invalid data
         file_put_contents($file, 'invalid data');
 
-        // Also write metadata to ensure the file exists
+        // Write valid metadata
         $metaPath = $file . '.meta';
-        file_put_contents($metaPath, serialize([
+        $metadata = [
             'created_at' => time(),
             'ttl' => 3600,
             'expires_at' => time() + 3600,
             'version' => '1.0'
-        ]));
+        ];
+        file_put_contents($metaPath, serialize($metadata));
 
+        // First check if the key exists
+        $this->assertTrue($this->cache->has($key));
+        
+        // Then try to get the corrupted data
         $this->expectException(ContainerException::class);
         $this->cache->get($key);
     }

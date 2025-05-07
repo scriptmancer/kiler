@@ -37,7 +37,7 @@ abstract class AbstractCompiledContainer extends Container
         $this->loadConfiguration($config);
     }
 
-    public function register(string $class, ?string $alias = null): void
+    public function register(string $class, ?string $alias = null, array $options = []): void
     {
         throw new ContainerException('Cannot register services in compiled container');
     }

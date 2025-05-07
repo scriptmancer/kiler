@@ -76,23 +76,25 @@ class ContainerCompiler
         $export = ['services' => []];
         foreach ($services as $id => $definition) {
             $export['services'][$id] = [
-                'class' => $definition['class'],
+                'class' => $definition['class'] ?? $id,
                 'implements' => $definition['implements'] ?? null,
                 'group' => $definition['group'] ?? null,
-                'singleton' => $definition['singleton'] ?? false,
+                'singleton' => $definition['singleton'] ?? true,
                 'tags' => $definition['tags'] ?? [],
-                'priority' => $definition['priority'] ?? 0
+                'priority' => $definition['priority'] ?? 0,
+                'arguments' => $definition['arguments'] ?? []
             ];
 
             // If this service implements an interface, register the interface as well
-            if ($definition['implements']) {
+            if (isset($definition['implements']) && $definition['implements']) {
                 $export['services'][$definition['implements']] = [
-                    'class' => $definition['class'],
+                    'class' => $definition['class'] ?? $id,
                     'implements' => null,
                     'group' => $definition['group'] ?? null,
-                    'singleton' => $definition['singleton'] ?? false,
+                    'singleton' => $definition['singleton'] ?? true,
                     'tags' => $definition['tags'] ?? [],
-                    'priority' => $definition['priority'] ?? 0
+                    'priority' => $definition['priority'] ?? 0,
+                    'arguments' => $definition['arguments'] ?? []
                 ];
             }
         }

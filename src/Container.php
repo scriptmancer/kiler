@@ -111,7 +111,7 @@ class Container implements ContainerInterface
         }
     }
 
-    public function register(string $class, ?string $alias = null): void
+    public function register(string $class, ?string $alias = null, array $options = []): void
     {
         $reflection = new ReflectionClass($class);
         $attributes = $reflection->getAttributes(Service::class);
@@ -127,34 +127,42 @@ class Container implements ContainerInterface
             'group' => $service->group,
             'singleton' => $service->singleton,
             'tags' => $service->tags ?? [],
-            'priority' => $service->priority ?? 0
+            'priority' => $service->priority ?? 0,
+            'arguments' => $options['arguments'] ?? []
         ];
 
+        // Use the service ID from attribute if provided, otherwise use the class name
+        $serviceId = $service->id ?? $class;
+        
+        // Store service info under service ID
+        $this->services[$serviceId] = $serviceInfo;
+        
+        // Also store under class name for direct class resolution
         $this->services[$class] = $serviceInfo;
 
-        // Store alias if provided
+        // Store alias if provided (either from parameter or attribute)
         if ($alias !== null) {
-            $this->aliases[$alias] = $class;
+            $this->aliases[$alias] = $serviceId;
         }
 
         // Store group information
         if ($service->group) {
-            $this->groups[$service->group][] = $class;
+            $this->groups[$service->group][] = $serviceId;
         }
 
         // Store tag information
         if (!empty($service->tags)) {
             foreach ($service->tags as $tag) {
-                $this->tags[$tag][] = $class;
+                $this->tags[$tag][] = $serviceId;
             }
         }
 
         // Store registration order
-        $this->registrationOrder[] = $class;
+        $this->registrationOrder[] = $serviceId;
 
         // Register for explicitly specified interface
         if ($service->implements) {
-            $this->registerForInterface($service->implements, $class, $serviceInfo);
+            $this->registerForInterface($service->implements, $serviceId, $serviceInfo);
         }
 
         // Register for all implemented interfaces that have the Service attribute
@@ -164,7 +172,7 @@ class Container implements ContainerInterface
             if ($interfaceName !== $service->implements) { // Skip if already registered
                 $interfaceAttributes = $interface->getAttributes(Service::class);
                 if (!empty($interfaceAttributes)) {
-                    $this->registerForInterface($interfaceName, $class, $serviceInfo);
+                    $this->registerForInterface($interfaceName, $serviceId, $serviceInfo);
                 }
             }
         }
@@ -176,7 +184,7 @@ class Container implements ContainerInterface
         if ($this->eventDispatcher !== null) {
             $this->eventDispatcher->dispatch('container.service.registered', [
                 'event' => new ServiceRegisteredEvent(
-                    serviceId: $class,
+                    serviceId: $serviceId,
                     serviceClass: $class,
                     alias: $alias,
                     group: $service->group,
@@ -188,11 +196,11 @@ class Container implements ContainerInterface
         }
     }
 
-    private function registerForInterface(string $interfaceName, string $class, array $serviceInfo): void
+    private function registerForInterface(string $interfaceName, string $serviceId, array $serviceInfo): void
     {
         // Create a copy of service info for the interface
         $interfaceInfo = $serviceInfo;
-        $interfaceInfo['class'] = $class; // Keep the concrete class reference
+        $interfaceInfo['class'] = $serviceInfo['class']; // Keep the concrete class reference
         $this->services[$interfaceName] = $interfaceInfo;
         
         // Add the interface to the same groups and tags
@@ -287,6 +295,17 @@ class Container implements ContainerInterface
         return $matchingServices;
     }
 
+    private function formatDependencyValue($value): string
+    {
+        if (is_array($value)) {
+            return json_encode($value);
+        }
+        if (is_object($value)) {
+            return get_class($value);
+        }
+        return (string)$value;
+    }
+
     private function resolveService(string $id): object
     {
         // Check for circular dependency
@@ -299,11 +318,21 @@ class Container implements ContainerInterface
         $this->resolutionStack[] = $id;
 
         try {
+            // If the ID is an alias, resolve it
+            if (isset($this->aliases[$id])) {
+                $id = $this->aliases[$id];
+            }
+
             // If the ID is an interface, get its implementation class
             if (interface_exists($id)) {
                 if (!isset($this->services[$id])) {
                     throw new NotFoundException("No implementation found for interface $id");
                 }
+                $id = $this->services[$id]['class'];
+            }
+
+            // If the service ID is not a class name, try to find it in services
+            if (!class_exists($id) && isset($this->services[$id])) {
                 $id = $this->services[$id]['class'];
             }
 
@@ -374,7 +403,7 @@ class Container implements ContainerInterface
             }
 
             // Get constructor dependencies
-            $reflection = new ReflectionClass($id);
+            $reflection = new ReflectionClass($service['class']);
             $dependencies = [];
             
             if ($reflection->hasMethod('__construct')) {
@@ -396,9 +425,10 @@ class Container implements ContainerInterface
                         serviceId: $id,
                         instance: $instance,
                         fromCache: false,
-                        dependencies: array_map(function ($dep) {
-                            return is_object($dep) ? get_class($dep) : (string)$dep;
-                        }, $dependencies)
+                        dependencies: array_map(
+                            fn($dep) => $this->formatDependencyValue($dep),
+                            $dependencies
+                        )
                     )
                 ]);
             }
@@ -526,13 +556,32 @@ class Container implements ContainerInterface
         foreach ($parameters as $param) {
             // Check for named parameter
             if (isset($providedArgs[$param->getName()])) {
-                $dependencies[] = $providedArgs[$param->getName()];
+                $value = $providedArgs[$param->getName()];
+                
+                // Handle service references (starting with @)
+                if (is_string($value) && str_starts_with($value, '@')) {
+                    $serviceId = substr($value, 1);
+                    $dependencies[] = $this->get($serviceId);
+                    continue;
+                }
+                
+                $dependencies[] = $value;
                 continue;
             }
 
             // Check for positional parameter
             if (isset($providedArgs[$positionalIndex])) {
-                $dependencies[] = $providedArgs[$positionalIndex];
+                $value = $providedArgs[$positionalIndex];
+                
+                // Handle service references (starting with @)
+                if (is_string($value) && str_starts_with($value, '@')) {
+                    $serviceId = substr($value, 1);
+                    $dependencies[] = $this->get($serviceId);
+                    $positionalIndex++;
+                    continue;
+                }
+                
+                $dependencies[] = $value;
                 $positionalIndex++;
                 continue;
             }
@@ -587,28 +636,31 @@ class Container implements ContainerInterface
                     'arguments' => $arguments
                 ];
 
-                // Store service info under concrete class name
+                // Store service info under service ID
+                $this->services[$id] = $serviceInfo;
+                
+                // Also store under class name for direct class resolution
                 $this->services[$class] = $serviceInfo;
 
                 // Store alias if provided
                 if ($alias !== null) {
-                    $this->aliases[$alias] = $class;
+                    $this->aliases[$alias] = $id;
                 }
 
                 // Store group information
                 if ($group) {
-                    $this->groups[$group][] = $class;
+                    $this->groups[$group][] = $id;
                 }
 
                 // Store tag information
                 if (!empty($tags)) {
                     foreach ($tags as $tag) {
-                        $this->tags[$tag][] = $class;
+                        $this->tags[$tag][] = $id;
                     }
                 }
 
                 // Store registration order
-                $this->registrationOrder[] = $class;
+                $this->registrationOrder[] = $id;
 
                 // If this service implements an interface, store it under the interface name too
                 if ($implements) {
@@ -672,16 +724,42 @@ class Container implements ContainerInterface
     public function addServiceProvider(ServiceProviderInterface $provider): void
     {
         $this->serviceProviders[] = $provider;
-        // Sort providers by priority
+        // Sort providers by priority and dependencies
         usort($this->serviceProviders, function(ServiceProviderInterface $a, ServiceProviderInterface $b) {
-            return $b->getPriority() <=> $a->getPriority();
+            // First sort by priority
+            $priorityDiff = $b->getPriority() <=> $a->getPriority();
+            if ($priorityDiff !== 0) {
+                return $priorityDiff;
+            }
+            
+            // Then check dependencies
+            $aDeps = $a->getDependencies();
+            $bDeps = $b->getDependencies();
+            
+            // If A depends on B, B should come first
+            if (in_array(get_class($b), $aDeps)) {
+                return 1;
+            }
+            
+            // If B depends on A, A should come first
+            if (in_array(get_class($a), $bDeps)) {
+                return -1;
+            }
+            
+            return 0;
         });
     }
 
     public function registerProviders(): void
     {
+        // First register all services
         foreach ($this->serviceProviders as $provider) {
             $provider->register($this);
+        }
+        
+        // Then boot them in order
+        foreach ($this->serviceProviders as $provider) {
+            $provider->boot($this);
         }
     }
 } 
