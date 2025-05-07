@@ -1,0 +1,34 @@
+# Composer
+/vendor/
+composer.lock
+
+# IDE
+.idea/
+.vscode/
+*.sublime-*
+*.swp
+*.swo
+
+# Cache and logs
+/var/cache/*
+/var/logs/*
+.phpunit.cache/
+.phpunit.result.cache
+
+# Build artifacts
+/build/
+/dist/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db 
