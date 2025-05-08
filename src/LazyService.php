@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ScriptMancer\Kiler;
 
+use ScriptMancer\Kiler\Interfaces\LazyServiceInterface;
+
 class LazyService implements LazyServiceInterface
 {
     private ?object $instance = null;

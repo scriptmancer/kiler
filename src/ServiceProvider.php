@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace ScriptMancer\Kiler;
 
-class ServiceProvider
+use ScriptMancer\Kiler\Interfaces\ServiceProviderInterface;
+
+class ServiceProvider implements ServiceProviderInterface
 {
     private array $providers = [];
     private array $services = [];

@@ -2,7 +2,6 @@
 
 [![PHP Version](https://img.shields.io/badge/PHP-8.3%2B-blue.svg)](https://php.net)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Build Status](https://img.shields.io/github/workflow/status/scriptmancer/kiler/CI)](https://github.com/scriptmancer/kiler/actions)
 
 Kiler is a lightweight, feature-rich dependency injection container for PHP applications. It provides a simple yet powerful way to manage dependencies and services in your application.
 
