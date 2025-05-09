@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace ScriptMancer\Kiler;
+namespace Scriptmancer\Kiler;
 
-use ScriptMancer\Kiler\Event\EventDispatcherInterface;
-use ScriptMancer\Kiler\Event\ServiceRegisteredEvent;
-use ScriptMancer\Kiler\Event\ServiceResolvedEvent;
-use ScriptMancer\Kiler\Exceptions\ContainerException;
-use ScriptMancer\Kiler\Compiled\AbstractCompiledContainer;
+use Scriptmancer\Kiler\Event\EventDispatcherInterface;
+use Scriptmancer\Kiler\Event\ServiceRegisteredEvent;
+use Scriptmancer\Kiler\Event\ServiceResolvedEvent;
+use Scriptmancer\Kiler\Exceptions\ContainerException;
+use Scriptmancer\Kiler\Compiled\AbstractCompiledContainer;
 
 class ContainerCompiler
 {
@@ -16,7 +16,7 @@ class ContainerCompiler
     private string $bootstrapDir;
     private string $namespace;
 
-    public function __construct(string $cacheDir, string $namespace = 'ScriptMancer\\Kiler\\Compiled')
+    public function __construct(string $cacheDir, string $namespace = 'Scriptmancer\\Kiler\\Compiled')
     {
         $this->cacheDir = rtrim($cacheDir, '/');
         $this->bootstrapDir = $this->cacheDir . '/bootstrap';
@@ -61,7 +61,7 @@ class ContainerCompiler
         return "<?php\n\n" .
             "declare(strict_types=1);\n\n" .
             "namespace " . $this->namespace . ";\n\n" .
-            "use ScriptMancer\\Kiler\\Compiled\\AbstractCompiledContainer;\n\n" .
+            "use Scriptmancer\\Kiler\\Compiled\\AbstractCompiledContainer;\n\n" .
             "class Container extends AbstractCompiledContainer\n" .
             "{\n" .
             "    protected function getServicesFilePath(): string\n" .

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ScriptMancer\Kiler;
+namespace Scriptmancer\Kiler;
 
-use ScriptMancer\Kiler\Interfaces\LazyServiceInterface;
+use Scriptmancer\Kiler\Interfaces\LazyServiceInterface;
 
 class LazyService implements LazyServiceInterface
 {

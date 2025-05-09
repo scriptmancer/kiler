@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace ScriptMancer\Kiler\Tests;
+namespace Scriptmancer\Kiler\Tests;
 
 use PHPUnit\Framework\TestCase;
-use ScriptMancer\Kiler\Container;
-use ScriptMancer\Kiler\Cache\ContainerCacheInterface;
-use ScriptMancer\Kiler\Cache\FileCache;
-use ScriptMancer\Kiler\Attributes\{Service, Factory, Inject};
-use ScriptMancer\Kiler\Exceptions\{ContainerException, NotFoundException};
+use Scriptmancer\Kiler\Container;
+use Scriptmancer\Kiler\Cache\ContainerCacheInterface;
+use Scriptmancer\Kiler\Cache\FileCache;
+use Scriptmancer\Kiler\Attributes\{Service, Factory, Inject};
+use Scriptmancer\Kiler\Exceptions\{ContainerException, NotFoundException};
 
 class ContainerTest extends TestCase
 {

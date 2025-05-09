@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use ScriptMancer\Kiler\{Container, ServiceProvider};
-use ScriptMancer\Kiler\Cache\FileCache;
-use ScriptMancer\Kiler\Attributes\Service;
+use Scriptmancer\Kiler\{Container, ServiceProvider};
+use Scriptmancer\Kiler\Cache\FileCache;
+use Scriptmancer\Kiler\Attributes\Service;
 
 // Define interfaces
 interface LoggerInterface

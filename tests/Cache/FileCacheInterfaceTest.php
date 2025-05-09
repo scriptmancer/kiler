@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ScriptMancer\Kiler\Tests\Cache;
+namespace Scriptmancer\Kiler\Tests\Cache;
 
-use ScriptMancer\Kiler\Cache\ContainerCacheInterface;
-use ScriptMancer\Kiler\Cache\FileCache;
+use Scriptmancer\Kiler\Cache\ContainerCacheInterface;
+use Scriptmancer\Kiler\Cache\FileCache;
 
 class FileCacheInterfaceTest extends ContainerCacheInterfaceTest
 {

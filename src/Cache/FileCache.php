@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ScriptMancer\Kiler\Cache;
+namespace Scriptmancer\Kiler\Cache;
 
-use ScriptMancer\Kiler\Cache\ContainerCacheInterface;
-use ScriptMancer\Kiler\Exceptions\NotFoundException;
-use ScriptMancer\Kiler\Exceptions\ContainerException;
+use Scriptmancer\Kiler\Cache\ContainerCacheInterface;
+use Scriptmancer\Kiler\Exceptions\NotFoundException;
+use Scriptmancer\Kiler\Exceptions\ContainerException;
 
 class FileCache implements ContainerCacheInterface
 {

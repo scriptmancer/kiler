@@ -13,9 +13,13 @@ Kiler is a lightweight, feature-rich dependency injection container for PHP appl
 - 🔌 Interface-based dependency injection
 - 🏷️ Service tagging and grouping
 - 🔒 Singleton and factory services
-- 📦 PSR-11 compliant
-- 🧪 Comprehensive test coverage
-- 🚀 Production-ready with compiled container support
+- 📦 PSR-11 Compliance & Framework Compatibility
+
+Kiler implements the [PSR-11 Container Interface](https://www.php-fig.org/psr/psr-11/), making it compatible with any library or framework that supports PSR-11 containers. You can use Kiler as a drop-in DI container for custom projects or integrate it with popular frameworks (such as Laravel, Symfony, Slim, etc.) as long as they support PSR-11 or allow custom containers.
+
+- **Service Providers:** Extend `AbstractServiceProvider` for modular service registration and boot logic.
+- **Optional Priority & Dependencies:** Providers can optionally override `getPriority()` and `getDependencies()` for advanced initialization order control.
+- **No Framework Lock-in:** Kiler does not require any framework-specific code, ensuring portability and reusability.
 
 ## Installation
 
@@ -26,8 +30,8 @@ composer require scriptmancer/kiler
 ## Quick Start
 
 ```php
-use ScriptMancer\Kiler\Container;
-use ScriptMancer\Kiler\Attributes\Service;
+use Scriptmancer\Kiler\Container;
+use Scriptmancer\Kiler\Attributes\Service;
 
 // Define a service
 #[Service]
@@ -53,7 +57,7 @@ $db = $container->get(Database::class);
 ### Using Attributes
 
 ```php
-use ScriptMancer\Kiler\Attributes\Service;
+use Scriptmancer\Kiler\Attributes\Service;
 
 #[Service(
     implements: DatabaseInterface::class,
@@ -113,8 +117,8 @@ $storageServices = $container->getServicesByTag('storage');
 For production environments, Kiler provides a compiled container that improves performance:
 
 ```php
-use ScriptMancer\Kiler\Container;
-use ScriptMancer\Kiler\ContainerCompiler;
+use Scriptmancer\Kiler\Container;
+use Scriptmancer\Kiler\ContainerCompiler;
 
 // In development
 $container = Container::getInstance();
@@ -134,7 +138,7 @@ $db = $container->get(Database::class);
 Kiler integrates with event systems through the `EventDispatcherInterface`:
 
 ```php
-use ScriptMancer\Kiler\Event\EventDispatcherInterface;
+use Scriptmancer\Kiler\Event\EventDispatcherInterface;
 
 $container->setEventDispatcher($eventDispatcher);
 ```
@@ -145,21 +149,21 @@ Available events:
 
 ## Service Providers
 
-Register service providers to configure services:
+A service provider is a class responsible for registering related services in the container. You can create your own providers by extending the `AbstractServiceProvider` class.
 
 ```php
-use ScriptMancer\Kiler\Interfaces\ServiceProviderInterface;
+use Scriptmancer\Kiler\AbstractServiceProvider;
+use Scriptmancer\Kiler\Container;
 
-class DatabaseServiceProvider implements ServiceProviderInterface
+class MyServiceProvider extends AbstractServiceProvider
 {
     public function register(Container $container): void
     {
-        $container->register(Database::class);
+        // Register your services here
     }
-
-    public function getPriority(): int
+    public function boot(Container $container): void
     {
-        return 0;
+        // Perform initialization after all services are registered
     }
 }
 

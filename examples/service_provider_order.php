@@ -2,9 +2,9 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use ScriptMancer\Kiler\Container;
-use ScriptMancer\Kiler\Interfaces\ServiceProviderInterface;
-use ScriptMancer\Kiler\Attributes\Service;
+use Scriptmancer\Kiler\Container;
+use Scriptmancer\Kiler\AbstractServiceProvider;
+use Scriptmancer\Kiler\Attributes\Service;
 
 // Example services
 #[Service(id: 'database', priority: 10)]
@@ -29,7 +29,7 @@ class LoggingService {
 }
 
 // Service providers
-class DatabaseProvider implements ServiceProviderInterface {
+class DatabaseProvider extends AbstractServiceProvider {
     public function register(Container $container): void {
         $container->register(DatabaseService::class);
     }
@@ -47,7 +47,7 @@ class DatabaseProvider implements ServiceProviderInterface {
     }
 }
 
-class CacheProvider implements ServiceProviderInterface {
+class CacheProvider extends AbstractServiceProvider {
     public function register(Container $container): void {
         $container->register(CacheService::class);
     }
@@ -65,7 +65,7 @@ class CacheProvider implements ServiceProviderInterface {
     }
 }
 
-class LoggingProvider implements ServiceProviderInterface {
+class LoggingProvider extends AbstractServiceProvider {
     public function register(Container $container): void {
         $container->register(LoggingService::class);
     }

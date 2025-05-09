@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ScriptMancer\Kiler\Interfaces;
+namespace Scriptmancer\Kiler\Interfaces;
 
-use ScriptMancer\Kiler\Container;
+use Scriptmancer\Kiler\Container;
 
 interface ServiceFactoryInterface
 {

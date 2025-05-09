@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ScriptMancer\Kiler\Tests\Cache;
+namespace Scriptmancer\Kiler\Tests\Cache;
 
 use PHPUnit\Framework\TestCase;
-use ScriptMancer\Kiler\Cache\FileCache;
-use ScriptMancer\Kiler\Exceptions\ContainerException;
+use Scriptmancer\Kiler\Cache\FileCache;
+use Scriptmancer\Kiler\Exceptions\ContainerException;
 
 class FileCacheTest extends TestCase
 {

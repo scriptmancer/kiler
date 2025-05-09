@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ScriptMancer\Kiler\Cache;
+namespace Scriptmancer\Kiler\Cache;
 
 interface ContainerCacheInterface
 {
@@ -19,7 +19,7 @@ interface ContainerCacheInterface
      *
      * @param string $key The cache key
      * @return mixed The cached value
-     * @throws \ScriptMancer\Kiler\Exceptions\NotFoundException If the key does not exist
+     * @throws \Scriptmancer\Kiler\Exceptions\NotFoundException If the key does not exist
      */
     public function get(string $key): mixed;
 
@@ -53,7 +53,7 @@ interface ContainerCacheInterface
      *
      * @param string $key The cache key
      * @return array{created_at: int, expires_at: int|null, version: string} The metadata
-     * @throws \ScriptMancer\Kiler\Exceptions\NotFoundException If the key does not exist
+     * @throws \Scriptmancer\Kiler\Exceptions\NotFoundException If the key does not exist
      */
     public function getMetadata(string $key): array;
 } 

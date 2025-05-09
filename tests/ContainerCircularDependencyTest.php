@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ScriptMancer\Kiler\Tests;
+namespace Scriptmancer\Kiler\Tests;
 
 use PHPUnit\Framework\TestCase;
-use ScriptMancer\Kiler\Container;
-use ScriptMancer\Kiler\Exceptions\ContainerException;
-use ScriptMancer\Kiler\Tests\Fixtures\CircularDependency\{ServiceA, ServiceB, ServiceC};
+use Scriptmancer\Kiler\Container;
+use Scriptmancer\Kiler\Exceptions\ContainerException;
+use Scriptmancer\Kiler\Tests\Fixtures\CircularDependency\{ServiceA, ServiceB, ServiceC};
 
 class ContainerCircularDependencyTest extends TestCase
 {

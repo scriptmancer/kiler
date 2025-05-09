@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ScriptMancer\Kiler\Tests;
+namespace Scriptmancer\Kiler\Tests;
 
-use ScriptMancer\Kiler\Attributes\Service;
+use Scriptmancer\Kiler\Attributes\Service;
 
 interface TestInterface
 {

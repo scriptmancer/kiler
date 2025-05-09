@@ -14,12 +14,15 @@
     },
     "autoload": {
         "psr-4": {
-            "ScriptMancer\\Kiler\\": "src/"
-        }
+            "Scriptmancer\\Kiler\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
-            "ScriptMancer\\Kiler\\Tests\\": "tests/"
+            "Scriptmancer\\Kiler\\Tests\\": "tests/"
         }
     },
     "scripts": {

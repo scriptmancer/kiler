@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use ScriptMancer\Kiler\Container;
-use ScriptMancer\Kiler\ContainerCompiler;
-use ScriptMancer\Kiler\Attributes\Service;
+use Scriptmancer\Kiler\Container;
+use Scriptmancer\Kiler\ContainerCompiler;
+use Scriptmancer\Kiler\Attributes\Service;
 
 // Example services
 #[Service]
@@ -73,7 +73,7 @@ if (getenv('APP_ENV') === 'dev') {
     $container->register(UserService::class);
     
     // Compile the container for production
-    $compiler = new ContainerCompiler($cacheDir, 'ScriptMancer\\Kiler\\Compiled');
+    $compiler = new ContainerCompiler($cacheDir, 'Scriptmancer\\Kiler\\Compiled');
     $containerPath = $compiler->compile($container);
     
     echo "Container compiled for production use.\n";
@@ -84,7 +84,7 @@ if (getenv('APP_ENV') === 'dev') {
 }
 
 // Load the compiled container class
-$containerClass = 'ScriptMancer\\Kiler\\Compiled\\Container';
+$containerClass = 'Scriptmancer\\Kiler\\Compiled\\Container';
 if (!class_exists($containerClass)) {
     throw new RuntimeException("Compiled container class not found. Did you run in development mode first?");
 }

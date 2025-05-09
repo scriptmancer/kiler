@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use ScriptMancer\Kiler\Container;
-use ScriptMancer\Kiler\Event\EventDispatcher;
-use ScriptMancer\Kiler\Attributes\{Service, Inject};
+use Scriptmancer\Kiler\Container;
+use Scriptmancer\Kiler\Event\EventDispatcher;
+use Scriptmancer\Kiler\Attributes\{Service, Inject};
 
 // Example service classes
 #[Service(id: 'high.priority', priority: 20)]

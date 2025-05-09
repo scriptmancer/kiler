@@ -2,12 +2,17 @@
 
 declare(strict_types=1);
 
-namespace ScriptMancer\Kiler;
+namespace Scriptmancer\Kiler;
 
-use ScriptMancer\Kiler\Interfaces\ServiceProviderInterface;
+use Scriptmancer\Kiler\AbstractServiceProvider;
 
-class ServiceProvider implements ServiceProviderInterface
+class ServiceProvider extends AbstractServiceProvider
 {
+    public function register(Container $container): void
+    {
+        // No-op: default implementation
+    }   
+
     private array $providers = [];
     private array $services = [];
     private array $groups = [];
@@ -27,11 +32,11 @@ class ServiceProvider implements ServiceProviderInterface
         }
     }
 
-    public function boot(): void
+    public function boot(Container $container): void
     {
         foreach ($this->providers as $providerClass => $provider) {
             if (!isset($this->booted[$providerClass])) {
-                $provider->boot();
+                $provider->boot($container);
                 $this->booted[$providerClass] = true;
             }
         }

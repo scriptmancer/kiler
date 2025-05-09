@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ScriptMancer\Kiler\Tests\Fixtures\CircularDependency;
+namespace Scriptmancer\Kiler\Tests\Fixtures\CircularDependency;
 
-use ScriptMancer\Kiler\Attributes\Service;
+use Scriptmancer\Kiler\Attributes\Service;
 
 #[Service]
 class ServiceB

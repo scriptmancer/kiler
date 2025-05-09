@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace ScriptMancer\Kiler;
+namespace Scriptmancer\Kiler;
 
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionParameter;
-use ScriptMancer\Kiler\Attributes\{Service, Inject};
-use ScriptMancer\Kiler\Exceptions\{ContainerException, NotFoundException};
-use ScriptMancer\Kiler\Cache\ContainerCacheInterface;
-use ScriptMancer\Kiler\Event\{EventDispatcherInterface, ServiceRegisteredEvent, ServiceResolvedEvent};
+use Scriptmancer\Kiler\Attributes\{Service, Inject};
+use Scriptmancer\Kiler\Exceptions\{ContainerException, NotFoundException};
+use Scriptmancer\Kiler\Cache\ContainerCacheInterface;
+use Scriptmancer\Kiler\Event\{EventDispatcherInterface, ServiceRegisteredEvent, ServiceResolvedEvent};
 use Psr\Container\ContainerInterface;
-use ScriptMancer\Kiler\Interfaces\ServiceFactoryInterface;
-use ScriptMancer\Kiler\Interfaces\ServiceProviderInterface;
+use Scriptmancer\Kiler\Interfaces\ServiceFactoryInterface;
+use Scriptmancer\Kiler\AbstractServiceProvider;
 
 class Container implements ContainerInterface
 {
@@ -721,11 +721,11 @@ class Container implements ContainerInterface
         $this->serviceFactories[] = $factory;
     }
 
-    public function addServiceProvider(ServiceProviderInterface $provider): void
+    public function addServiceProvider(AbstractServiceProvider $provider): void
     {
         $this->serviceProviders[] = $provider;
         // Sort providers by priority and dependencies
-        usort($this->serviceProviders, function(ServiceProviderInterface $a, ServiceProviderInterface $b) {
+        usort($this->serviceProviders, function(AbstractServiceProvider $a, AbstractServiceProvider $b) {
             // First sort by priority
             $priorityDiff = $b->getPriority() <=> $a->getPriority();
             if ($priorityDiff !== 0) {

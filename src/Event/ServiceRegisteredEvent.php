@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ScriptMancer\Kiler\Event;
+namespace Scriptmancer\Kiler\Event;
 
 class ServiceRegisteredEvent
 {

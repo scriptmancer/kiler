@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ScriptMancer\Kiler\Tests\Cache;
+namespace Scriptmancer\Kiler\Tests\Cache;
 
 use PHPUnit\Framework\TestCase;
-use ScriptMancer\Kiler\Cache\ContainerCacheInterface;
-use ScriptMancer\Kiler\Cache\ArrayCache;
-use ScriptMancer\Kiler\Exceptions\NotFoundException;
+use Scriptmancer\Kiler\Cache\ContainerCacheInterface;
+use Scriptmancer\Kiler\Cache\ArrayCache;
+use Scriptmancer\Kiler\Exceptions\NotFoundException;
 
 class ContainerCacheInterfaceTest extends TestCase
 {

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace ScriptMancer\Kiler\Tests;
+namespace Scriptmancer\Kiler\Tests;
 
 use PHPUnit\Framework\TestCase;
-use ScriptMancer\Kiler\Container;
-use ScriptMancer\Kiler\ContainerCompiler;
-use ScriptMancer\Kiler\Exceptions\ContainerException;
-use ScriptMancer\Kiler\Attributes\Service;
+use Scriptmancer\Kiler\Container;
+use Scriptmancer\Kiler\ContainerCompiler;
+use Scriptmancer\Kiler\Exceptions\ContainerException;
+use Scriptmancer\Kiler\Attributes\Service;
 
 class ContainerCompilerTest extends TestCase
 {

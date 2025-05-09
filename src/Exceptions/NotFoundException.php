@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ScriptMancer\Kiler\Exceptions;
+namespace Scriptmancer\Kiler\Exceptions;
 
 use Exception;
 use Psr\Container\NotFoundExceptionInterface;

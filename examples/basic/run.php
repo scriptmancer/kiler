@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-use ScriptMancer\Kiler\Container;
-use ScriptMancer\Kiler\Attributes\{Service, Factory};
+use Scriptmancer\Kiler\Container;
+use Scriptmancer\Kiler\Attributes\{Service, Factory};
 
 // Define interfaces
 interface DatabaseInterface
@@ -53,7 +53,7 @@ class UserService
 }
 
 // Create and configure container
-$container = new Container();
+$container = Container::getInstance();
 
 // Register services
 $container->register(MySQLDatabase::class);

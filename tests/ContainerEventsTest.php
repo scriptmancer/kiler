@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ScriptMancer\Kiler\Tests;
+namespace Scriptmancer\Kiler\Tests;
 
 use PHPUnit\Framework\TestCase;
-use ScriptMancer\Kiler\Container;
-use ScriptMancer\Kiler\Event\{EventDispatcher, ServiceRegisteredEvent, ServiceResolvedEvent};
-use ScriptMancer\Kiler\Tests\{TestService, DependentService};
+use Scriptmancer\Kiler\Container;
+use Scriptmancer\Kiler\Event\{EventDispatcher, ServiceRegisteredEvent, ServiceResolvedEvent};
+use Scriptmancer\Kiler\Tests\{TestService, DependentService};
 
 class ContainerEventsTest extends TestCase
 {

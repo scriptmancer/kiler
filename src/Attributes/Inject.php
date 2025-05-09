@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ScriptMancer\Kiler\Attributes;
+namespace Scriptmancer\Kiler\Attributes;
 
 use Attribute;
 

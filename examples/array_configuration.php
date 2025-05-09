@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use ScriptMancer\Kiler\Container;
-use ScriptMancer\Kiler\Event\EventDispatcher;
+use Scriptmancer\Kiler\Container;
+use Scriptmancer\Kiler\Event\EventDispatcher;
 
 // Example service classes
 class DatabaseConnection

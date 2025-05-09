@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ScriptMancer\Kiler\Interfaces;
+namespace Scriptmancer\Kiler\Interfaces;
 
 interface LazyServiceInterface
 {

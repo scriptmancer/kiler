@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ScriptMancer\Kiler\Tests\Event;
+namespace Scriptmancer\Kiler\Tests\Event;
 
 use PHPUnit\Framework\TestCase;
-use ScriptMancer\Kiler\Event\EventDispatcher;
+use Scriptmancer\Kiler\Event\EventDispatcher;
 
 class EventDispatcherTest extends TestCase
 {

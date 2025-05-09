@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ScriptMancer\Kiler\Cache;
+namespace Scriptmancer\Kiler\Cache;
 
-use ScriptMancer\Kiler\Exceptions\NotFoundException;
+use Scriptmancer\Kiler\Exceptions\NotFoundException;
 
 class ArrayCache implements ContainerCacheInterface
 {

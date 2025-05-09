@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ScriptMancer\Kiler\Compiled;
+namespace Scriptmancer\Kiler\Compiled;
 
-use ScriptMancer\Kiler\Container;
-use ScriptMancer\Kiler\Exceptions\ContainerException;
-use ScriptMancer\Kiler\Event\EventDispatcherInterface;
+use Scriptmancer\Kiler\Container;
+use Scriptmancer\Kiler\Exceptions\ContainerException;
+use Scriptmancer\Kiler\Event\EventDispatcherInterface;
 
 class CompiledContainer extends Container
 {

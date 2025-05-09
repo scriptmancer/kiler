@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use ScriptMancer\Kiler\Container;
-use ScriptMancer\Kiler\Event\EventDispatcher;
-use ScriptMancer\Kiler\Interfaces\ServiceFactoryInterface;
-use ScriptMancer\Kiler\Interfaces\ServiceProviderInterface;
-use ScriptMancer\Kiler\Attributes\{Service, Inject};
+use Scriptmancer\Kiler\Container;
+use Scriptmancer\Kiler\Event\EventDispatcher;
+use Scriptmancer\Kiler\Interfaces\ServiceFactoryInterface;
+use Scriptmancer\Kiler\AbstractServiceProvider;
+use Scriptmancer\Kiler\Attributes\{Service, Inject};
 
 // Example service classes
 #[Service(id: 'primary.db')]
@@ -89,7 +89,7 @@ class DatabaseConnectionFactory implements ServiceFactoryInterface
 }
 
 // Example service provider
-class DatabaseServiceProvider implements ServiceProviderInterface
+class DatabaseServiceProvider extends AbstractServiceProvider
 {
     public function register(Container $container): void
     {
